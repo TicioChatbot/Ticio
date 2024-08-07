@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticio - Research Chat</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <div class="bg-dark border-right" id="sidebar">
+            <div class="sidebar-heading text-center py-4" style="background-color: #910A0A;">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="img-fluid" style="max-width: 150px;">
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="https://ticio.co" class="list-group-item list-group-item-action bg-dark text-light">Home</a>
+                <a href="{{ url_for('chat') }}" class="list-group-item list-group-item-action bg-dark text-light">Investigación</a>
+                <a href="{{ url_for('instruct') }}" class="list-group-item list-group-item-action bg-dark text-light">Chat</a>
+            </div>
+        </div>
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper" class="w-100 p-4">
+            <div class="container-fluid">
+                <div class="chat-container">
+                    <div id="messages" class="flex-grow-1 mb-3" style="overflow-y: scroll; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+                        <div class="spinner-container">
+                            <div class="spinner-border custom-spinner" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                            <div id="spinnerText">Ticio está pensando...</div>
+                        </div>
+                    </div>
+                    <form id="messageForm" style="display: flex; align-items: center;">
+                        <input type="text" id="messageInput" class="form-control" placeholder="Type a message" autocomplete="off" required style="flex-grow: 1; margin-right: 10px; border: none; outline: none;">
+                        <button type="submit" class="btn" style="background-color: #910A0A; color: white;">Send</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+        const socket = io('/instruct');
+
+        // Log socket connection status
+        socket.on('connect', () => {
+            console.log('Connected to /research namespace');
+        });
+
+        const spinnerTexts = [
+            "Ticio está pensando...",
+            "Ticio demora entre 30 y 60 segs",
+            "¿Ya revisaste estados hoy?",
+            "Aprovecha y ¡prepárate un cafecito!",
+            "Un momento por favor...",
+            "Procesando tu solicitud...",
+            "¡Ticio está en acción!",
+            "No te preocupes, esto toma un momentico...",
+            "Ticio está consultando la jurisprudencia...",
+            "Revisando los archivos, un segundo...",
+            "Ticio está buscando precedentes...",
+            "¿Tomaste notas del último caso?",
+            "Esto no tarda, solo un poquito más...",
+            "Ticio está en modo detective...",
+            "Pensando... y pensando...",
+            "Ticio está afinando los detalles...",
+            "Un momento, estamos casi listos...",
+            "Ticio está preparando la mejor respuesta...",
+            "Consultando la biblioteca legal...",
+            "¡No te desconectes, ya casi!"
+        ];
+
+        const spinnerTextElement = document.getElementById('spinnerText');
+        let spinnerTextCycleInterval;
+
+        function getRandomSpinnerText() {
+            return spinnerTexts[Math.floor(Math.random() * spinnerTexts.length)];
+        }
+
+        function showSpinner() {
+            const spinnerContainer = document.querySelector('.spinner-container');
+            spinnerContainer.style.display = 'flex';
+            document.getElementById('messages').appendChild(spinnerContainer);
+            document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+            startSpinnerTextCycle();
+        }
+
+        function hideSpinner() {
+            document.querySelector('.spinner-container').style.display = 'none';
+            stopSpinnerTextCycle();
+        }
+
+        function startSpinnerTextCycle() {
+            updateSpinnerText();
+            spinnerTextCycleInterval = setInterval(updateSpinnerText, 3000);
+        }
+
+        function stopSpinnerTextCycle() {
+            clearInterval(spinnerTextCycleInterval);
+        }
+
+        function updateSpinnerText() {
+            const newText = getRandomSpinnerText();
+            spinnerTextElement.classList.remove('fade-in');
+            void spinnerTextElement.offsetWidth;  // Trigger reflow to restart CSS animation
+            spinnerTextElement.textContent = newText;
+            spinnerTextElement.classList.add('fade-in');
+        }
+
+        // Function to add message to the chat window
+        function addMessage(message, sender) {
+            console.log('Adding message:', message, 'from:', sender);  // Debugging
+            const messageContainer = document.createElement('div');
+            messageContainer.classList.add('message-container', sender === 'Ticio' ? 'response-container' : 'user-container');
+
+            const labelElement = document.createElement('div');
+            labelElement.classList.add('message-label');
+            labelElement.textContent = sender;
+
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', sender === 'Ticio' ? 'response' : 'user-message');
+            messageElement.textContent = message;
+
+            messageContainer.appendChild(labelElement);
+            messageContainer.appendChild(messageElement);
+            document.getElementById('messages').appendChild(messageContainer);
+            document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+        }
+
+        // Handle incoming messages
+        socket.on('response', function(data) {
+            console.log('Received response:', data);  // Debugging
+            hideSpinner();
+            addMessage(data, 'Ticio');
+        });
+
+        // Handle form submission
+        document.getElementById('messageForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showSpinner();
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value;
+            console.log('Sending message:', message);  // Debugging
+            socket.send(message);
+
+            // Display the sent message
+            addMessage(message, 'You');
+            messageInput.value = '';
+        });
+
+        // Handle enter key press
+        document.getElementById('messageInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('messageForm').dispatchEvent(new Event('submit'));
+            }
+        });
+    </script>
+</body>
+</html>
+

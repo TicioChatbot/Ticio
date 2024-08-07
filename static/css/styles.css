@@ -164,3 +164,27 @@ form button {
 .conversation-item:hover {
     background-color: #f1f1f1;
 }
+
+.spinner-container {
+    display: none;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.spinner-border.custom-spinner {
+    margin-right: 10px;
+    color: #910A0A;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}

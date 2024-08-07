@@ -1,11 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
-from flask_socketio import SocketIO, send
+from flask_socketio import SocketIO, emit
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
+from time import sleep
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mysecret'
@@ -74,31 +75,30 @@ def logout():
 @app.route('/')
 @login_required
 def chat():
-    return render_template('chat.html')
+    return render_template('research.html')
 
-""""
-@app.route('/get_conversations')
+@app.route('/instruct')
 @login_required
-def get_conversations():
-    user_id = current_user.id
-    conversations = Conversation.query.filter_by(user_id=user_id).all()
-    conversations_list = [conv.conversation for conv in conversations]
-    return jsonify(conversations=conversations_list)
-"""
+def instruct():
+    return render_template('instruct.html')
 
-@socketio.on('message')
-def handle_message(message):
-    print(f'Received message: {message}')
-    response = f'You said: {message}'
-    send(response)
-    
-    """
-    # Save conversation to the database
-    if current_user.is_authenticated:
-        new_conversation = Conversation(user_id=current_user.id, conversation=message)
-        db.session.add(new_conversation)
-        db.session.commit()
-    """
+@socketio.on('message', namespace='/research')
+def handle_research_message(message):
+    print(f'Received message in Research: {message}')
+    response = f'Research response: {message}'
+    sleep(10)
+    print("slept correctly")
+    emit('response', response, namespace='/research')
+    print("emitted correctly")
+
+@socketio.on('message', namespace='/instruct')
+def handle_instruct_message(message):
+    print(f'Received message in Instruct: {message}')
+    response = f'Instruct response: {message}'
+    sleep(10)
+    print("slept correctly")
+    emit('response', response, namespace='/instruct')
+    print("emitted correctly")
 
 if __name__ == '__main__':
     with app.app_context():
