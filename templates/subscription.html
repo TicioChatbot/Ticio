@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suscripción Inactiva</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth-styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 mt-5">
+                <div class="alert alert-warning" role="alert">
+                    <h4 class="alert-heading">Suscripción Inactiva</h4>
+                    <p>Actualmente, no hemos recibido el pago para su suscripción. Para poder acceder a todas las funcionalidades, por favor complete el proceso de pago.</p>
+                    <hr>
+                    <a href="{{user.get_link()}}" class="btn btn-primary mt-3">Ir a la Página de Pago</a>
+                    <hr>
+                    <p class="mb-0">Si necesita asistencia o tiene preguntas sobre el proceso de pago, contáctenos al correo ticiochatbot@gmail.com.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
