@@ -131,7 +131,7 @@ def webhook():
 def handle_research_message(message):
     response = inference(message)
     emit('response', response, namespace='/research')
-    new = Message(message, response)
+    new = Message(question = message, answer = response)
     db.session.add(new)
     db.session.commit()
 
