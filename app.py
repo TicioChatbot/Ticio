@@ -7,6 +7,7 @@ from wtforms.validators import InputRequired, Length
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from time import sleep
+from inference import inference
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mysecret'
@@ -85,19 +86,9 @@ def instruct():
 @socketio.on('message', namespace='/research')
 def handle_research_message(message):
     print(f'Received message in Research: {message}')
-    response = f'Research response: {message}'
-    sleep(10)
+    response = inference(message)
     print("slept correctly")
     emit('response', response, namespace='/research')
-    print("emitted correctly")
-
-@socketio.on('message', namespace='/instruct')
-def handle_instruct_message(message):
-    print(f'Received message in Instruct: {message}')
-    response = f'Instruct response: {message}'
-    sleep(10)
-    print("slept correctly")
-    emit('response', response, namespace='/instruct')
     print("emitted correctly")
 
 if __name__ == '__main__':

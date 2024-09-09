@@ -114,18 +114,18 @@ def inference(prompt):
   for year in years:
     results.extend(query_db(encoded_prompt, include_metadata = True, table = str(year), include_value=True, limit = 3))
   results.sort(key=sort_by_score, reverse=True)
-  context = f"""
-  
-  system
+  context =f"""
+  <|begin_of_text|>
+  <|start_header_id|>system<|end_header_id|>
   Eres Ticio, un asistente de investigación jurídica. Tu deber es organizar el contenido de las sentencias de la jurisprudencia de acuerdo 
   a las necesidades del usuario. Debes responder solo en español. Debes responder solo en base a la información del contexto a continuación.
   Siempre debes mencionar la fuente en tu escrito, debe tener un estilo formal y juridico.
   Contexto: 
   {construct_result(results)}
-  
-  user
+  <|eot_id|>
+  <|start_header_id|>user<|end_header_id|>
   {prompt}
-  
-  assistant
+  <|eot_id|>
+  <|start_header_id|>assistant<|end_header_id|>
   """
   return live_inference(context, max_new_tokens=512) + '\n' + referencias(results)

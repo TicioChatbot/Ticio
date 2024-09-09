@@ -1,3 +1,8 @@
-from inference import * 
+from dotenv import load_dotenv
+import os
+from inference import inference
 
-print(inference("derecho al medio ambiente"))
+load_dotenv()
+
+x = input()
+print(inference(x))
