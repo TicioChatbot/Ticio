@@ -7,7 +7,6 @@ from dotenv import load_dotenv
 import os
 
 # Load environment variables from .env file
-load_dotenv()
 
 key = os.getenv("Key")
 url = os.getenv("url")
