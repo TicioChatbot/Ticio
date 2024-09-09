@@ -9,7 +9,7 @@ import os
 # Load environment variables from .env file
 load_dotenv()
 
-key = os.getenv("Key")
+key = os.getenv("key")
 url = os.getenv("url")
 opts = ClientOptions().replace(schema="vecs")
 client = create_client(url, key, options=opts)
