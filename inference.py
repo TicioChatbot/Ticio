@@ -21,8 +21,7 @@ port = os.getenv("port")
 db_name = "postgres"
 DB_CONNECTION = f"postgresql://{user}:{password}@{host}:{port}/{db_name}"
 vx = vecs.create_client(DB_CONNECTION)
-query_embeds = vx.get_or_create_collection(name="docs", dimension=768)
-model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
+model = SentenceTransformer('Snowflake/snowflake-arctic-embed-xs')
 
 def find_prediction(prediction_list, id):
   for item in prediction_list:
@@ -74,7 +73,7 @@ def live_inference(prompt, max_new_tokens = 1024, top_k = 50, top_p = 0.9, tempe
 
 
 def query_db(query, limit = 5, filters = {}, measure = "cosine_distance", include_value = False, include_metadata=False, table = "2023"):
-  query_embeds = vx.get_or_create_collection(name= table, dimension=768)
+  query_embeds = vx.get_or_create_collection(name= table, dimension=384)
   ans = query_embeds.query(
       data=query,
       limit=limit,
